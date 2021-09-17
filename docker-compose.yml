@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  busybox:
+    image: busybox:1.33.1
+    command: /tmp/output-log.sh
+    volumes:
+      - "./busybox/output-log.sh:/tmp/output-log.sh:ro"
+      - "log:/log"
+  fluent-bit:
+    image: fluent/fluent-bit:1.8.6
+    volumes:
+      - "./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro"
+      - "log:/log"
+  loki:
+    image: grafana/loki:2.3.0
+  grafana:
+    image: grafana/grafana:8.1.4
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: secret
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./grafana/loki.yml:/etc/grafana/provisioning/datasources/loki.yml:ro"
+volumes:
+  log:
